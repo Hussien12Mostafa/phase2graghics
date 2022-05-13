@@ -34,12 +34,12 @@ namespace our {
             // For the attribute locations, use the constants defined above: ATTRIB_LOC_POSITION, ATTRIB_LOC_COLOR, etc
             elementCount = elements.size();
         
-            GLuint VAO;
+            
             glGenVertexArrays(1, &VAO);
             glBindVertexArray(VAO);
 
             //need to get an array from the vector
-            GLuint VBO;
+           
             glGenBuffers(1, &VBO);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
             glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(Vertex),  &vertices[0] , GL_STATIC_DRAW);
@@ -52,12 +52,12 @@ namespace our {
             glVertexAttribPointer(ATTRIB_LOC_COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(Vertex), (void*) offsetof(Vertex, color));
 
             glEnableVertexAttribArray(ATTRIB_LOC_TEXCOORD);
-            glVertexAttribPointer(ATTRIB_LOC_TEXCOORD, 2, GL_FLOAT, true, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+            glVertexAttribPointer(ATTRIB_LOC_TEXCOORD, 2, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
 
             glEnableVertexAttribArray(ATTRIB_LOC_NORMAL);
-            glVertexAttribPointer(ATTRIB_LOC_NORMAL, 3, GL_FLOAT, true, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+            glVertexAttribPointer(ATTRIB_LOC_NORMAL, 3, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-            GLuint EBO;
+            
             glGenBuffers(1, &EBO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
@@ -72,6 +72,7 @@ namespace our {
         // this function should render the mesh
         void draw() 
         {
+            glBindVertexArray(VAO);
             //TODO: (Req 1) Write this function
             glDrawElements(GL_TRIANGLES,elementCount,GL_UNSIGNED_INT,(void*)0);
         }

@@ -55,6 +55,7 @@ class EntityTestState: public our::State {
             // Then we setup the material, send the transform matrix to the shader then draw the mesh
             our::Material* material = meshRenderer->material;
             material->setup();
+            
             material->shader->set("transform", VP * meshRenderer->getOwner()->getLocalToWorldMatrix());
             meshRenderer->mesh->draw();
         }

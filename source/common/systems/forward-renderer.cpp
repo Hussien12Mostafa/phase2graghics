@@ -15,10 +15,10 @@ namespace our {
             
             // We can draw the sky using the same shader used to draw textured objects
             ShaderProgram* skyShader = new ShaderProgram();
-            skyShader->attach("assets/shaders/textured.vert", GL_VERTEX_SHADER);
-            skyShader->attach("assets/shaders/textured.frag", GL_FRAGMENT_SHADER);
+            skyShader->attach("../assets/shaders/textured.vert", GL_VERTEX_SHADER);
+            skyShader->attach("../assets/shaders/textured.frag", GL_FRAGMENT_SHADER);
             skyShader->link();
-            
+            //not done
             //TODO: (Req 9) Pick the correct pipeline state to draw the sky
             // Hints: the sky will be draw after the opaque objects so we would need depth testing but which depth funtion should we pick?
             // We will draw the sphere from the inside, so what options should we pick for the face culling.
@@ -49,17 +49,30 @@ namespace our {
         // Then we check if there is a postprocessing shader in the configuration
         if(config.contains("postprocess")){
             //TODO: (Req 10) Create a framebuffer
-        // glm::ivec2 getFrameBufferSize() {
-        //     glm::ivec2 size;
-        //     glfwGetFramebufferSize(window, &(size.x), &(size.y));
-        //     return size;
-        // }
+    
+            GLuint frame_buffer;
+            glGenFramebuffers(1, &frame_buffer);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+            //maybe change GL_DRAW_FRAMEBUFFER slide 80 texure
+
             //TODO: (Req 10) Create a color and a depth texture and attach them to the framebuffer
             // Hints: The color format can be (Red, Green, Blue and Alpha components with 8 bits for each channel).
             // The depth format can be (Depth component with 24 bits).
-            
+            GLuint colorRT;
+            glGenTextures(1, &colorRT);
+            glBindTexture(GL_TEXTURE_2D, colorRT);
+            GLuint mip_levels = glm::floor(glm::log2(glm::max<float>(windowSize[0], windowSize[1]/2))) + 1;
+            glTexStorage2D(GL_TEXTURE_2D, mip_levels, GL_RGBA8, windowSize[0], windowSize[1]/2);
+            //create depth
+            GLuint depthRT;
+            glGenTextures(1, &depthRT);
+            glBindTexture(GL_TEXTURE_2D, depthRT);
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32, windowSize[0], windowSize[1]/2);
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorRT, 0);   
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthRT, 0);
+
             //TODO: (Req 10) Unbind the framebuffer just to be safe
-            
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             // Create a vertex array to use for drawing the texture
             glGenVertexArrays(1, &postProcessVertexArray);
 
@@ -152,7 +165,7 @@ namespace our {
         //TODO: (Req 8) Get the camera ViewProjection matrix and store it in VP
         glm::mat4 VP =camera->getProjectionMatrix(windowSize) * camera->getViewMatrix();
         //TODO: (Req 8) Set the OpenGL viewport using windowSize
-        glViewport(0, 0, windowSize[0], windowSize[1]);
+        glViewport(0,  0, windowSize[0], windowSize[1]);
 
         //TODO: (Req 8) Set the clear color to black and the clear depth to 1
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -165,7 +178,8 @@ namespace our {
         // If there is a postprocess material, bind the framebuffer
         if(postprocessMaterial){
             //TODO: (Req 10) bind the framebuffer
-
+            //not done
+           // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
         }
 
         //TODO: (Req 8) Clear the color and depth buffers
@@ -181,24 +195,30 @@ namespace our {
 
         // If there is a sky material, draw the sky
         if(this->skyMaterial){
-            //TODO: (Req 9) setup the sky material
+// this->skyMaterial->setup();
+//          glm::mat4 cameraposition= camera->getProjectionMatrix(windowSize)*camera->getViewMatrix();
+//             //TODO: (Req 9) setup the sky material
             
-            //TODO: (Req 9) Get the camera position
+//             //TODO: (Req 9) Get the camera position
 
-            //TODO: (Req 9) Create a model matrix for the sy such that it always follows the camera (sky sphere center = camera position)
-
-            //TODO: (Req 9) We want the sky to be drawn behind everything (in NDC space, z=1)
-            // We can acheive the is by multiplying by an extra matrix after the projection but what values should we put in it?
-            glm::mat4 alwaysBehindTransform = glm::mat4(
-            //  Row1, Row2, Row3, Row4
-                1.0f, 0.0f, 0.0f, 0.0f, // Column1
-                0.0f, 1.0f, 0.0f, 0.0f, // Column2
-                0.0f, 0.0f, 1.0f, 0.0f, // Column3
-                0.0f, 0.0f, 0.0f, 1.0f  // Column4
-            );
-            //TODO: (Req 9) set the "transform" uniform
+//             //TODO: (Req 9) Create a model matrix for the sy such that it always follows the camera (sky sphere center = camera position)
+//              glm::mat4 model=cameraposition;
+//             //TODO: (Req 9) We want the sky to be drawn behind everything (in NDC space, z=1)
+//             // We can acheive the is by multiplying by an extra matrix after the projection but what values should we put in it?
+//             glm::mat4 alwaysBehindTransform = glm::mat4(
+//             //  Row1, Row2, Row3, Row4
+//                 1.0f, 0.0f, 0.0f, 0.0f, // Column1
+//                 0.0f, 1.0f, 0.0f, 0.0f, // Column2
+//                 0.0f, 0.0f, 1.0f, 0.0f, // Column3
+//                 0.0f, 0.0f, 0.0f, 1.0f  // Column4
+//             );
+//             //TODO: (Req 9) set the "transform" uniform
             
-            //TODO: (Req 9) draw the sky sphere
+//             //TODO: (Req 9) draw the sky sphere
+            
+//            this->skyMaterial->shader->set("transform", VP * meshRenderer->getOwner()->getLocalToWorldMatrix());
+//             meshRenderer->mesh->draw();
+//             this->skyMaterial->
             
         }
         //TODO: (Req 8) Draw all the transparent commands
